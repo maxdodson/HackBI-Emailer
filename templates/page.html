@@ -1,0 +1,243 @@
+{% extends "template.html" %}
+{% block content %}
+    <div style="max-width: 1000px; width: 100%; margin: 0 auto 0 auto; text-align: left; padding: 20px">
+        <div class="row" style="margin-bottom: 10px;">
+            <div class="col-8" style="margin-top: auto; margin-bottom: auto;">
+                <span id="url">{{ file }}</span>
+                <span class="notif" style="display: none;">— <i style="color: #2e65d4">May have changed (click detected)</i></span>
+                <button class="btn notif" style="display: none;" data-toggle="popover" data-placement="top" data-content="It is impossible to determine the current URL of an iframe (which contains the email rendering). If a link is clicked, the URL changes and the email will no longer be displayed.">
+                    <span class="badge" style="padding: 0px; font-size: 12pt; cursor: pointer; color: #20448b">ⓘ</span>
+                </button>
+            </div>
+            <div class="col-4" style="display: inherit;">
+                <button id="send-btn" class="btn btn-primary" style="margin-right: 0;margin-left: auto;margin-top: auto;margin-bottom: auto;">
+                    <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 30 30" preserveAspectRatio="xMidYMid meet" style="margin-top: -3px;">
+                        <g transform="translate(0,30) scale(0.10,-0.10)" fill="#ffffff" stroke="none">
+                        <path d="M138 233 c-60 -20 -108 -39 -108 -42 0 -3 16 -19 36 -34 l35 -29 62 49 62 48 -48 -62 -49 -62 29 -35 c15 -20 31 -36 34 -36 5 0 79 218 79 234 0 10 -21 5 -132 -31z"/>
+                        </g>
+                    </svg>
+                    Send
+                </button>
+            </div>
+        </div>
+        <iframe id="i" src="" frameborder="0" onload="onLoaded()"></iframe>
+    </div>
+    <div class="modal fade" id="sendModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content text-left">
+            <div class="modal-header">
+                <h4 class="modal-title">Send {{ file }}</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label><b>Subject</b></label>
+                        <input id="subject" placeholder="Subject" style="display: block; width: 70%; max-width: 500px; min-width: 300px;" autocomplete="off"></input>
+                    </div>
+                    <div class="form-group">
+                        <label><b>Recipients</b><span style="font-size: 9pt; color: gray; margin-left: 8px;"><i>Separated by commas</i></span></label>
+                        <textarea id="recipients" rows="3" placeholder="Add recipients"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button id="prelim-send" type="button" class="btn btn-primary">Send</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="modal fade" id="confirmModal" tabindex="-2" role="dialog">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content text-left">
+            <div class="modal-header">
+                <h4 class="modal-title">Are you sure?</h4>
+                <button type="button" class="close" data-dismiss="modal" data-toggle="modal" data-target="#sendModal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            Are you sure you want to send?<br><br>This action <b>cannot be undone</b>.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" data-toggle="modal" data-target="#sendModal">Cancel</button>
+                <button id="submit-send" type="button" class="btn btn-danger">Send</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="modal fade" id="successModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content text-center">
+                <div class="modal-body">
+                    <svg id="svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="150" height="150" viewBox="0, 0, 400,400"><g id="svgg"><path id="path0" d="M162.739 28.288 C -2.491 62.975,-25.265 294.206,129.951 361.209 C 246.144 411.367,373.691 327.972,374.121 201.563 C 374.511 86.787,274.519 4.822,162.739 28.288 M229.195 53.828 C 344.682 78.402,388.432 218.219,307.133 302.905 C 214.437 399.461,51.667 333.964,51.398 200.000 C 51.211 106.615,138.811 34.597,229.195 53.828 M219.929 185.534 L 162.520 242.944 142.194 222.663 L 121.868 202.382 112.116 212.134 L 102.364 221.886 132.434 251.955 L 162.503 282.024 230.054 214.473 L 297.605 146.922 288.304 137.523 C 283.189 132.354,278.629 128.125,278.171 128.125 C 277.713 128.125,251.504 153.959,219.929 185.534 " stroke="none" fill="#4CC552" fill-rule="evenodd"></path></g></svg>
+                    <br>
+                    <h2>Success!</h2>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="margin: 0 auto">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="successModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content text-center">
+                <div class="modal-body">
+                    <svg id="svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="150" height="150" viewBox="0, 0, 400,400"><g id="svgg"><path id="path0" d="M162.739 28.288 C -2.491 62.975,-25.265 294.206,129.951 361.209 C 246.144 411.367,373.691 327.972,374.121 201.563 C 374.511 86.787,274.519 4.822,162.739 28.288 M229.195 53.828 C 344.682 78.402,388.432 218.219,307.133 302.905 C 214.437 399.461,51.667 333.964,51.398 200.000 C 51.211 106.615,138.811 34.597,229.195 53.828 M219.929 185.534 L 162.520 242.944 142.194 222.663 L 121.868 202.382 112.116 212.134 L 102.364 221.886 132.434 251.955 L 162.503 282.024 230.054 214.473 L 297.605 146.922 288.304 137.523 C 283.189 132.354,278.629 128.125,278.171 128.125 C 277.713 128.125,251.504 153.959,219.929 185.534 " stroke="none" fill="#4CC552" fill-rule="evenodd"></path></g></svg>
+                    <br>
+                    <h2>Success!</h2>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="margin: 0 auto">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block scripts %}
+<script>
+    function onLoaded() { // Adjust height of iframe to content height
+        $('#i').css('height', document.getElementById('i').contentWindow.document.body.scrollHeight + "px");
+    }
+    /* Create a unique user ID for the iframe URL to ensure it is always reloaded */
+    var rand = Math.floor((Math.random()*1000000)+1);
+    var iframe = document.getElementById('i');
+    iframe.src = "{{ url_for('static', filename=file) }}?uid"+rand;
+    /* */
+    window.Props = {};
+    Props.dynamic = false;
+    $('#send-btn').click(function() {
+        let re_discover = /<\?=[\s\S][^\n]+\?>/g;
+        let re_extract = /[^<>?=\s]+/gi;
+        $.get("{{ url_for('static', filename=file) }}").then(function(data) {
+            var match = data.match(re_discover);
+            if (match) { // <?= ?> tag found in HTML file
+                Props.dynamic = true;
+                var list = "";
+                var count = 0;
+                for (var i=0; i<match.length; i++) { // Extract dynamic variable name from tag
+                    list += match[i].match(re_extract)[0] + " ";
+                    count++;
+                }
+                alert("Dynamic HTML tag (<?= ?>) found.\nRemove the tag or provide a value for: " + list + "\n\nSee manual for proper syntax.");
+            }
+        });
+        $('#sendModal').modal('show');
+    });
+    $('#prelim-send').click(function() {
+        if ($('#subject').val() == "" || $('#recipients').val() == "") {
+            alert("Field(s) empty. Please complete all fields.");
+            return;
+        }
+
+        if (Props.dynamic) {
+            Props.json = {};
+            try { // Verify json by attempting to parse it
+                Props.json = JSON.parse("[" + $('#recipients').val() + "]");
+            } catch (e) {
+                alert("JSON formatted incorrectly.\n\nA common mistake is using single quotes or forgetting braces.");
+                return;
+            }
+            for (var key of Object.keys(Props.json)) { // Verify email addresses embedded in json are formatted properly
+                for (var key2 of Object.keys(Props.json[key])) {
+                    if (key2 == 'email') {
+                        let re = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/g;
+                        if (Props.json[key][key2].match(re) && Props.json[key][key2].match(re)[0] == Props.json[key][key2]) {
+                        }
+                        else {
+                            alert("Recipient email(s) formatted incorrectly.\n\nSpaces & new lines are not allowed.");
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            // Verify email addresses are formatted properly
+            let re = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/g;
+            var arr = $('#recipients').val().split(',');
+            for (let a of arr) {
+                if (a.match(re) && a.match(re)[0] == a) {
+                    continue;
+                }
+                else {
+                    alert("Recipient email(s) formatted incorrectly.\n\nSpaces & new lines are not allowed.");
+                    return;
+                }
+            }
+        }
+
+        $('#sendModal').modal('hide');
+        $('#confirmModal').modal('show');
+    });
+    $('#submit-send').click(function() {
+        $('#submit-send').html('<div class="spinner-border spinner-border-sm text-light" role="status"></div>');
+        var subject = $('#subject').val();
+        var recipients;
+        if (Props.dynamic) {
+            recipients = JSON.stringify(Props.json);
+        } else {
+            recipients = JSON.stringify($('#recipients').val().split(','));
+        }
+
+        fd = new FormData();
+        fd.append('subject', subject);
+        fd.append('recipients', recipients);
+        
+        $.get({
+            url: "{{ url_for('static', filename=file) }}", 
+            cache: false
+        }).then(function(data) { // Retrieve file to be sent
+            var blob = new Blob([data], { type: 'text/html' });
+            var reader = new FileReader();
+            reader.onload = function(e) { 
+                fd.append('html', e.target.result);
+                response = $.ajax({
+                    type: "POST",
+                    url: '/send/',
+                    data: fd,
+                    crossDomain: true,
+                    contentType: false,
+                    processData: false,
+                    dataType: "text/javascript",
+                    statusCode: {
+			            201: function() {
+                            $('#confirmModal').modal('hide');
+                            $('#subject').val('');
+                            $('#recipients').val('')
+                            $('#submit-send').html('Send');
+                            $('#successModal').modal('show');
+                        }
+                    }
+                });
+            }
+            reader.readAsDataURL(blob);
+            
+        });        
+    });
+</script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+<script>
+    var myConfObj = {
+        iframeMouseOver : false
+    }
+    window.addEventListener('blur',function(){
+    if (myConfObj.iframeMouseOver){
+        $('#url').css('opacity', '.4');
+        $('.notif').show();
+        $("[data-toggle=popover]").popover();
+    }
+    });
+
+    document.getElementById('i').addEventListener('mouseover',function(){
+        myConfObj.iframeMouseOver = true;
+    });
+    document.getElementById('i').addEventListener('mouseout',function(){
+        myConfObj.iframeMouseOver = false;
+    });
+</script>
+{% endblock scripts %}

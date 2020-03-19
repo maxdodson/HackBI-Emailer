@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% if title %}
+        <title>{{ title }}</title>
+    {% else %}
+        <title>HackBI Email App</title>
+    {% endif %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
+    <style>
+        html {
+            font-size: 13pt;
+        }
+        body {
+            background-color: #343a40;
+            min-width: 300px;
+            font-family: Lato;
+        }
+        iframe {
+            width: 100%;
+            height: 2100px;
+            border: 2px solid #aaaaaa;
+            border-radius: 4px;
+            background-color: white;
+        }
+        textarea {
+            border: 1px solid lightgray;
+            border-radius: 5px;
+            padding: 5px;
+            margin-bottom: 2px;
+            width: 100%;
+            background-color: white;
+        }
+        input {
+            border: 1px solid lightgray;
+            background-color: white;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 550px;
+            padding: 5px;
+            margin-bottom: 3px;
+        }
+        textarea:focus, input:focus {
+            outline: none;
+            border: 1px solid rgb(150, 150, 150);
+        }
+        .jumbotron {
+            padding-top: 30px;
+            margin-bottom: 0;
+            padding-bottom: 20px;
+            background-color: #f0f1f2;
+        }
+        .card {
+            width: 14rem;
+            height: 14rem;
+            margin: 10px auto 25px auto;
+            padding: 10px;
+            box-shadow: 0 4px 10px 0 rgba(0,0,0,0.2);
+            background: #fff;
+            color: black;
+            font-family: Lato, Verdana, Geneva, Tahoma, Arial, Helvetica, sans-serif;
+            font-size: 18px;
+            border-radius: 8px;
+            display: table;
+        }
+        .card:hover {
+            cursor: pointer;
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+        }
+        .desc {
+            font-size: .8rem;
+            line-height: 1.5;
+            display: inline-block;
+        }
+        .nav-item path {
+            fill: gray;
+        }
+        svg {
+            margin-right: 1px;
+        }
+        .nav-item:hover path {
+            fill: white;
+        }
+        path.active {
+            fill: white;
+        }
+        .txt {
+            margin-left: auto;
+            margin-right: auto;
+            color: white;
+            width: 100%;
+            height: 150px;
+            padding: 60px 0;
+            background-color: #343a40;
+        }
+        #url {
+            font-size: 1.2rem;
+        }
+
+        @media screen and (min-width: 992px) {
+            #preview {
+                margin-top: 34px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar sticky-top navbar-expand navbar-dark bg-dark">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    {% if page=="dashboard" %}
+                    <a class="nav-link active" href="/">
+                        <svg class="svg-icon" viewBox="0 0 20 20" style="width: 18px; margin-top: -4.25px;">
+                            <path class="active" fill="none" d="M7.228,11.464H1.996c-0.723,0-1.308,0.587-1.308,1.309v5.232c0,0.722,0.585,1.308,1.308,1.308h5.232
+                                c0.723,0,1.308-0.586,1.308-1.308v-5.232C8.536,12.051,7.95,11.464,7.228,11.464z M7.228,17.351c0,0.361-0.293,0.654-0.654,0.654
+                                H2.649c-0.361,0-0.654-0.293-0.654-0.654v-3.924c0-0.361,0.292-0.654,0.654-0.654h3.924c0.361,0,0.654,0.293,0.654,0.654V17.351z
+                                M17.692,11.464H12.46c-0.723,0-1.308,0.587-1.308,1.309v5.232c0,0.722,0.585,1.308,1.308,1.308h5.232
+                                c0.722,0,1.308-0.586,1.308-1.308v-5.232C19,12.051,18.414,11.464,17.692,11.464z M17.692,17.351c0,0.361-0.293,0.654-0.654,0.654
+                                h-3.924c-0.361,0-0.654-0.293-0.654-0.654v-3.924c0-0.361,0.293-0.654,0.654-0.654h3.924c0.361,0,0.654,0.293,0.654,0.654V17.351z
+                                M7.228,1H1.996C1.273,1,0.688,1.585,0.688,2.308V7.54c0,0.723,0.585,1.308,1.308,1.308h5.232c0.723,0,1.308-0.585,1.308-1.308
+                                V2.308C8.536,1.585,7.95,1,7.228,1z M7.228,6.886c0,0.361-0.293,0.654-0.654,0.654H2.649c-0.361,0-0.654-0.292-0.654-0.654V2.962
+                                c0-0.361,0.292-0.654,0.654-0.654h3.924c0.361,0,0.654,0.292,0.654,0.654V6.886z M17.692,1H12.46c-0.723,0-1.308,0.585-1.308,1.308
+                                V7.54c0,0.723,0.585,1.308,1.308,1.308h5.232C18.414,8.848,19,8.263,19,7.54V2.308C19,1.585,18.414,1,17.692,1z M17.692,6.886
+                                c0,0.361-0.293,0.654-0.654,0.654h-3.924c-0.361,0-0.654-0.292-0.654-0.654V2.962c0-0.361,0.293-0.654,0.654-0.654h3.924
+                                c0.361,0,0.654,0.292,0.654,0.654V6.886z">
+                            </path>
+                        </svg>
+                    {% else %}
+                        <a class="nav-link" href="/">
+                            <svg class="svg-icon" viewBox="0 0 20 20" style="width: 18px; margin-top: -4.25px;">
+                                <path fill="none" d="M7.228,11.464H1.996c-0.723,0-1.308,0.587-1.308,1.309v5.232c0,0.722,0.585,1.308,1.308,1.308h5.232
+                                    c0.723,0,1.308-0.586,1.308-1.308v-5.232C8.536,12.051,7.95,11.464,7.228,11.464z M7.228,17.351c0,0.361-0.293,0.654-0.654,0.654
+                                    H2.649c-0.361,0-0.654-0.293-0.654-0.654v-3.924c0-0.361,0.292-0.654,0.654-0.654h3.924c0.361,0,0.654,0.293,0.654,0.654V17.351z
+                                    M17.692,11.464H12.46c-0.723,0-1.308,0.587-1.308,1.309v5.232c0,0.722,0.585,1.308,1.308,1.308h5.232
+                                    c0.722,0,1.308-0.586,1.308-1.308v-5.232C19,12.051,18.414,11.464,17.692,11.464z M17.692,17.351c0,0.361-0.293,0.654-0.654,0.654
+                                    h-3.924c-0.361,0-0.654-0.293-0.654-0.654v-3.924c0-0.361,0.293-0.654,0.654-0.654h3.924c0.361,0,0.654,0.293,0.654,0.654V17.351z
+                                    M7.228,1H1.996C1.273,1,0.688,1.585,0.688,2.308V7.54c0,0.723,0.585,1.308,1.308,1.308h5.232c0.723,0,1.308-0.585,1.308-1.308
+                                    V2.308C8.536,1.585,7.95,1,7.228,1z M7.228,6.886c0,0.361-0.293,0.654-0.654,0.654H2.649c-0.361,0-0.654-0.292-0.654-0.654V2.962
+                                    c0-0.361,0.292-0.654,0.654-0.654h3.924c0.361,0,0.654,0.292,0.654,0.654V6.886z M17.692,1H12.46c-0.723,0-1.308,0.585-1.308,1.308
+                                    V7.54c0,0.723,0.585,1.308,1.308,1.308h5.232C18.414,8.848,19,8.263,19,7.54V2.308C19,1.585,18.414,1,17.692,1z M17.692,6.886
+                                    c0,0.361-0.293,0.654-0.654,0.654h-3.924c-0.361,0-0.654-0.292-0.654-0.654V2.962c0-0.361,0.293-0.654,0.654-0.654h3.924
+                                    c0.361,0,0.654,0.292,0.654,0.654V6.886z">
+                                </path>
+                            </svg>
+                    {% endif %}   
+                            Dashboard
+                        </a>
+                </li>
+                <li class="nav-item">
+                    {% if page=="new" %}
+                        <a class="nav-link active" href="/new">
+                            <svg class="svg-icon" viewBox="0 0 20 20" style="width: 18px; margin-top: -4.75px;">
+                                <path class="active" d="M13.68,9.448h-3.128V6.319c0-0.304-0.248-0.551-0.552-0.551S9.448,6.015,9.448,6.319v3.129H6.319
+                                    c-0.304,0-0.551,0.247-0.551,0.551s0.247,0.551,0.551,0.551h3.129v3.129c0,0.305,0.248,0.551,0.552,0.551s0.552-0.246,0.552-0.551
+                                    v-3.129h3.128c0.305,0,0.552-0.247,0.552-0.551S13.984,9.448,13.68,9.448z M10,0.968c-4.987,0-9.031,4.043-9.031,9.031
+                                    c0,4.989,4.044,9.032,9.031,9.032c4.988,0,9.031-4.043,9.031-9.032C19.031,5.012,14.988,0.968,10,0.968z M10,17.902
+                                    c-4.364,0-7.902-3.539-7.902-7.903c0-4.365,3.538-7.902,7.902-7.902S17.902,5.635,17.902,10C17.902,14.363,14.364,17.902,10,17.902
+                                    z">
+                                </path>
+                            </svg>
+                    {% else %}
+                        <a class="nav-link" href="/new">
+                            <svg class="svg-icon" viewBox="0 0 20 20" style="width: 18px; margin-top: -4.75px;">
+                                <path d="M13.68,9.448h-3.128V6.319c0-0.304-0.248-0.551-0.552-0.551S9.448,6.015,9.448,6.319v3.129H6.319
+                                    c-0.304,0-0.551,0.247-0.551,0.551s0.247,0.551,0.551,0.551h3.129v3.129c0,0.305,0.248,0.551,0.552,0.551s0.552-0.246,0.552-0.551
+                                    v-3.129h3.128c0.305,0,0.552-0.247,0.552-0.551S13.984,9.448,13.68,9.448z M10,0.968c-4.987,0-9.031,4.043-9.031,9.031
+                                    c0,4.989,4.044,9.032,9.031,9.032c4.988,0,9.031-4.043,9.031-9.032C19.031,5.012,14.988,0.968,10,0.968z M10,17.902
+                                    c-4.364,0-7.902-3.539-7.902-7.903c0-4.365,3.538-7.902,7.902-7.902S17.902,5.635,17.902,10C17.902,14.363,14.364,17.902,10,17.902
+                                    z">
+                                </path>
+                            </svg>
+                    {% endif %}
+                            New Email
+                        </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="jumbotron jumbotron-fluid text-center">
+        {% block content %}{% endblock content %}
+    </div>
+    <div class="text-center txt">Made with <span style="color: crimson">♥</span> by Max Dodson</div>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    {% block scripts %}{% endblock scripts %}
+</body>

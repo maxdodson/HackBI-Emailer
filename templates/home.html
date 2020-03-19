@@ -1,0 +1,16 @@
+{% extends "template.html" %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            {% for file in files %}
+            <div class="card" onclick="location.href='/template/{{ file.name }}'">
+                <p class="align-middle" style="display: table-cell;">
+                    {{ file.name }}
+                    <br><br>
+                    <span class="desc text-muted">{{ file.description }}</span>
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

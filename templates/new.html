@@ -1,0 +1,129 @@
+{% extends "template.html" %}
+{% block content %}
+    <div class="row" style="margin: 5px 15px;">
+        <div class="col-12 col-lg text-left">
+            <div class="text-center"><h5>Edit</h5></div>
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label>Title</label>
+                <input id="title" placeholder="Title" style="display: block;" autocomplete="off"></input>
+            </div>
+            <div class="form-group">
+                <label>HTML</label>
+                <button class="btn" data-toggle="popover" data-placement="top" data-content="Set href to &quot__link__&quot to automatically populate it with a GitHub Gist link." style="padding: 0 5px 0 5px; margin-top: -5px;">
+                    <span class="badge" style="padding: 0px; font-size: 12pt; cursor: pointer;">ⓘ</span>
+                </button>
+                <textarea id="html" rows="23" placeholder="Insert HTML here"></textarea>
+            </div>
+        </div>
+        <div class="d-none d-lg-block" style="border: 1px solid gray; margin-top: 10px;"></div>
+        <div class="col-12 col-lg">
+            <div><h5>View</h5></div>
+            <iframe id="preview" srcdoc="<body style='background-color: white'><h1 style='text-align: center; margin-top: 47vh; font-family: Arial; color: gray'>EMPTY</h1></body>" frameborder="0" style="border: 1px solid lightgray; border-radius: 5px; height: 668px; background-color: white;"></iframe>
+        </div>
+    </div>
+    <button id="prelim-publish" class="btn btn-primary" style="margin: 5px auto;">Publish</button>
+    <button class="btn" data-toggle="popover" data-placement="top" data-content="This document may be made public on GitHub and will be stored on your computer." style="position: absolute; margin-top: 6px;">
+        <span class="badge" style="padding: 0px; font-size: 12pt; cursor: pointer;">ⓘ</span>
+    </button>
+    <div class="modal fade" id="verifyModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+        <div class="modal-content text-left">
+            <div class="modal-header">
+                <h4 class="modal-title">Are you sure?</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+            Are you sure you want to publish this template?<br><br>It will be made <b>public</b> on GitHub if necessary.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button id="publish-btn" type="submit" class="btn btn-danger">Publish</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="modal fade" id="successModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content text-center">
+                <div class="modal-body">
+                    <svg id="svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="150" height="150" viewBox="0, 0, 400,400"><g id="svgg"><path id="path0" d="M162.739 28.288 C -2.491 62.975,-25.265 294.206,129.951 361.209 C 246.144 411.367,373.691 327.972,374.121 201.563 C 374.511 86.787,274.519 4.822,162.739 28.288 M229.195 53.828 C 344.682 78.402,388.432 218.219,307.133 302.905 C 214.437 399.461,51.667 333.964,51.398 200.000 C 51.211 106.615,138.811 34.597,229.195 53.828 M219.929 185.534 L 162.520 242.944 142.194 222.663 L 121.868 202.382 112.116 212.134 L 102.364 221.886 132.434 251.955 L 162.503 282.024 230.054 214.473 L 297.605 146.922 288.304 137.523 C 283.189 132.354,278.629 128.125,278.171 128.125 C 277.713 128.125,251.504 153.959,219.929 185.534 " stroke="none" fill="#4CC552" fill-rule="evenodd"></path></g></svg>
+                    <br>
+                    <h2>Success!</h2>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" style="margin: 0 auto">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block scripts %}
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script>
+        var files = {{ files|safe }}; // filenames must be web safe
+        $('#title').change(function() {
+            if (!($('#title').val().includes('.html'))) {
+                $('#title').val($('#title').val() + '.html');
+            }
+            for (let val of files.values()) {
+                if (val['name'] == $('#title').val()) {
+                    alert("Filename " + $('#title').val() + " is taken. Please choose a different title.");
+                    $('#title').val("");
+                }
+            }
+        });
+        function delay(fn, ms) { // Not by me
+            let timer = 0
+            return function(...args) {
+                clearTimeout(timer)
+                timer = setTimeout(fn.bind(this, ...args), ms || 0)
+            }
+        }
+        $('#html').on('change paste', function() {
+            $('#preview').attr('srcdoc', $('#html').val())
+        });
+        $('#html').on('keyup', delay(function() {
+            $('#preview').attr('srcdoc', $('#html').val())
+        }, 1000));
+        $("[data-toggle=popover]").popover();
+        $('#prelim-publish').click(function() { // Assert that fields are complete
+            if ($('#title').val() == "" || $('#html').val() == "") {
+                alert("Field(s) empty. Please complete all fields.");
+                return;
+            }
+            $('#verifyModal').modal('show');
+        });
+        $('#publish-btn').click(function() {
+            $('#publish-btn').html('<div class="spinner-border spinner-border-sm text-light" role="status"></div>');
+            var title = $('#title').val();
+            var html = $('#html').val();
+            var encoded_data = "";
+            var pairs = [];
+            pairs.push("title=" + encodeURIComponent(title));
+            pairs.push("html=" + encodeURIComponent(html));
+            encoded_data = pairs.join('&').replace(' ', '+');
+            response = $.ajax({
+                type: "POST",
+                url: "/publish/",
+                data: encoded_data,
+                processData: false,
+                contentType: false,
+                statusCode: {
+                    201: function() {
+                        $('#verifyModal').modal('hide');
+                        $('#title').val('');
+                        $('#html').val('');
+                        $("#preview").attr('srcdoc',"<body style='background-color: white'><h1 style='text-align: center; margin-top: 47vh; font-family: Arial; color: gray'>EMPTY</h1></body>");
+                        $('#successModal').modal('show');
+                    }
+                }
+            });
+            setTimeout(function() {
+                $('#verifyModal').modal('hide');
+                $('#publish-btn').html('Publish');
+            }, 2000)
+        });
+    </script>
+{% endblock scripts %}
